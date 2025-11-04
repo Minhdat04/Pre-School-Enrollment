@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace PreschoolEnrollmentSystem.API.DTOs.Enrollment
 {
-	public class SubmitEnrollmentDto
+	public class ApplicationStatusDto
 	{
 	}
 }
