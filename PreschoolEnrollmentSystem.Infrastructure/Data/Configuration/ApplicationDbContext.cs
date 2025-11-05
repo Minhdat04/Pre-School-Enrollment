@@ -23,6 +23,20 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Configure global query filter for soft delete
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    var parameter = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
+                    var property = System.Linq.Expressions.Expression.Property(parameter, nameof(BaseEntity.IsDeleted));
+                    var filter = System.Linq.Expressions.Expression.Lambda(
+                        System.Linq.Expressions.Expression.Equal(property, System.Linq.Expressions.Expression.Constant(false)),
+                        parameter);
+
+                    modelBuilder.Entity(entityType.ClrType).HasQueryFilter(filter);
+                }
+            }
 
             modelBuilder.Entity<User>(entity =>
             {

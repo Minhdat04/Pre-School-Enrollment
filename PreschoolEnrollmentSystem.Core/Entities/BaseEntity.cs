@@ -16,11 +16,18 @@ namespace PreschoolEnrollmentSystem.Core.Entities
 
         public DateTime UpdatedAt { get; set; }
 
+        public bool IsDeleted { get; set; }
+
+        public DateTime? DeletedAt { get; set; }
+
+        public string? DeletedBy { get; set; }
+
         protected BaseEntity()
         {
             Id = Guid.NewGuid();
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
+            IsDeleted = false;
         }
     }
 }

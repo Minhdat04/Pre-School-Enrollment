@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using PreschoolEnrollmentSystem.API.DTOs.Auth;
+using PreschoolEnrollmentSystem.Core.DTOs.Auth;
 
 namespace PreschoolEnrollmentSystem.Services.Interfaces
 {
@@ -20,29 +20,5 @@ namespace PreschoolEnrollmentSystem.Services.Interfaces
         Task<bool> UpdateUserRoleAsync(string userId, string newRole, string adminUserId);
         Task<bool> DeactivateUserAsync(string userId, string adminUserId);
         Task<bool> ReactivateUserAsync(string userId, string adminUserId);
-    }
-    public class FirebaseTokenInfo
-    {
-        public string Uid { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public bool EmailVerified { get; set; }
-        public string Role { get; set; } = string.Empty;
-        public DateTime IssuedAt { get; set; }
-        public DateTime ExpiresAt { get; set; }
-    }
-    public class UserProfileDto
-    {
-        public Guid Id { get; set; }
-        public string FirebaseUid { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public bool EmailVerified { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
-        public bool IsActive { get; set; }
-        public DateTime? LastLoginAt { get; set; }
-        public int? ProfileCompletionPercentage { get; set; }
     }
 }

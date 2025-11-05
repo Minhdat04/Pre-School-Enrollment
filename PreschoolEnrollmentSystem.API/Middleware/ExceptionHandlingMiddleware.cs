@@ -15,11 +15,11 @@ namespace PreschoolEnrollmentSystem.API.Middleware
 
         public ExceptionHandlingMiddleware(
             RequestDelegate next,
-            ILogger<ExceptionHandlingMiddleware> _logger,
+            ILogger<ExceptionHandlingMiddleware> logger,
             IWebHostEnvironment environment)
         {
             _next = next ?? throw new ArgumentNullException(nameof(next));
-            this._logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _isDevelopment = environment.IsDevelopment();
         }
         public async Task InvokeAsync(HttpContext context)
@@ -75,6 +75,13 @@ namespace PreschoolEnrollmentSystem.API.Middleware
             return exception switch
             {
                 // 400 Bad Request - Invalid input or validation errors
+                ArgumentNullException argNullEx => (
+                    HttpStatusCode.BadRequest,
+                    "BadRequest",
+                    $"Required parameter '{argNullEx.ParamName}' is missing",
+                    argNullEx.StackTrace
+                ),
+
                 ArgumentException argEx => (
                     HttpStatusCode.BadRequest,
                     "BadRequest",
@@ -82,11 +89,12 @@ namespace PreschoolEnrollmentSystem.API.Middleware
                     argEx.StackTrace
                 ),
 
-                ArgumentNullException argNullEx => (
-                    HttpStatusCode.BadRequest,
-                    "BadRequest",
-                    $"Required parameter '{argNullEx.ParamName}' is missing",
-                    argNullEx.StackTrace
+                // 403 Forbidden - Authenticated but not authorized (more specific pattern first)
+                UnauthorizedAccessException forbiddenEx when forbiddenEx.Message.Contains("permission") => (
+                    HttpStatusCode.Forbidden,
+                    "Forbidden",
+                    "You don't have permission to access this resource",
+                    forbiddenEx.StackTrace
                 ),
 
                 // 401 Unauthorized - Authentication required or failed
@@ -95,14 +103,6 @@ namespace PreschoolEnrollmentSystem.API.Middleware
                     "Unauthorized",
                     "Authentication required or credentials are invalid",
                     unauthEx.StackTrace
-                ),
-
-                // 403 Forbidden - Authenticated but not authorized
-                UnauthorizedAccessException forbiddenEx when forbiddenEx.Message.Contains("permission") => (
-                    HttpStatusCode.Forbidden,
-                    "Forbidden",
-                    "You don't have permission to access this resource",
-                    forbiddenEx.StackTrace
                 ),
 
                 // 404 Not Found - Resource doesn't exist

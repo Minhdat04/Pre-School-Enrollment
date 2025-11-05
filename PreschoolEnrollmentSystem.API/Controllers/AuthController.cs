@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using PreschoolEnrollmentSystem.API.DTOs.Auth;
+using PreschoolEnrollmentSystem.Core.DTOs.Auth;
 using PreschoolEnrollmentSystem.API.Filters;
 using PreschoolEnrollmentSystem.Services.Interfaces;
 
