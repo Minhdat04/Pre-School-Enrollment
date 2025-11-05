@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\PreschoolEnrollmentSystem.Core\PreschoolEnrollmentSystem.Core.csproj" />
@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Data\Migration\" />
-    <Folder Include="Data\Configuration\" />
   </ItemGroup>
 
   <ItemGroup>
