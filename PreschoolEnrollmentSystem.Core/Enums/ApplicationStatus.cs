@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace PreschoolEnrollmentSystem.Core.Enums
 {
-	public enum UserRole
+    public enum ApplicationStatus
     {
-        Parent,   
-        Staff,    
-        Admin,    
-        Teacher   
+        PaymentPending,   
+        PaymentCompleted, 
+        Approved,         
+        Rejected,         
+        Cancelled         
     }
 }

@@ -10,11 +10,8 @@ using System.Threading.Tasks;
 
 namespace PreschoolEnrollmentSystem.Core.Entities
 {
-    public class Student : BaseEntity
+    public class Child : BaseEntity
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public override Guid  Id { get; set; }
-
         [Required]
         [MaxLength(100)]
         public string FullName { get; set; }
@@ -23,19 +20,16 @@ namespace PreschoolEnrollmentSystem.Core.Entities
 
         public Gender Gender { get; set; }
 
-        public string? Image { get; set; }
-        public string? BirthCertificateImage { get; set; }
-
         [Required]
-        [MaxLength(50)]
-        public string Grade { get; set; }
+        [MaxLength(500)]
+        public string Address { get; set; }
+
+        public string? Image { get; set; }
+
+        public string? BirthCertificateImage { get; set; }
 
         [ForeignKey("Parent")]
         public Guid ParentId { get; set; }
         public virtual User Parent { get; set; }
-
-        [ForeignKey("Classroom")]
-        public Guid? ClassroomId { get; set; } // Có thể null nếu chưa xếp lớp
-        public virtual Classroom? Classroom { get; set; }
     }
 }

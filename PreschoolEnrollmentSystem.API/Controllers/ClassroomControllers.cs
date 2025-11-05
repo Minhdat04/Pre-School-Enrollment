@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PreschoolEnrollmentSystem.API.Controllers
 {
-	public class ClassesControllers : Controller
+	public class ClassroomControllers : Controller
 	{
 		public IActionResult Index()
 		{

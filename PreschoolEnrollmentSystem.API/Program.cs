@@ -1,7 +1,13 @@
+using Microsoft.EntityFrameworkCore;
 using PreschoolEnrollmentSystem.API.Middleware;
+using PreschoolEnrollmentSystem.Infrastructure.Data;
 using PreschoolEnrollmentSystem.Infrastructure.Firebase;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Register the DbContext with the dependency injection container
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 1. Add Controllers
 builder.Services.AddControllers();

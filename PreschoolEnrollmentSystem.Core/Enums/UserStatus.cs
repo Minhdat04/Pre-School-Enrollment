@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace PreschoolEnrollmentSystem.Core.Enums
 {
-	class StudentStatus
-	{
-	}
+    public enum UserStatus
+    {
+        Active,   
+        Inactive  
+    }
 }
