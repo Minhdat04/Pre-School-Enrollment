@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace PreschoolEnrollmentSystem.Core.Enums
 {
-	class ClassStatus
-	{
-	}
+    public enum Gender
+    {
+        Male,  
+        Female, 
+        Other   
+    }
 }
