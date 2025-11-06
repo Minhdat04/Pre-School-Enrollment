@@ -114,6 +114,7 @@ builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IAuthSe
 builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IEmailService,
     PreschoolEnrollmentSystem.Services.Implementation.EmailService>();
 builder.Services.AddScoped<IParentService, ParentService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 

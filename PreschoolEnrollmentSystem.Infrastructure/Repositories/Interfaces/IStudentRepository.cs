@@ -18,5 +18,8 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces
         Task<IEnumerable<Student>> GetStudentsWithoutClassroomAsync();
         Task<int> GetStudentCountByClassroomAsync(Guid classroomId);
         Task<bool> IsClassroomFullAsync(Guid classroomId);
+
+        Task<Student?> GetStudentWithDetailsAsync(Guid id);
+        Task<IEnumerable<Student>> GetAllStudentsWithDetailsAsync();
     }
 }

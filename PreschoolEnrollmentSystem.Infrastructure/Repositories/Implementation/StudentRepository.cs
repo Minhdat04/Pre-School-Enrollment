@@ -99,5 +99,24 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation
             var studentCount = await GetStudentCountByClassroomAsync(classroomId);
             return studentCount >= classroom.Capacity;
         }
+
+        public async Task<Student?> GetStudentWithDetailsAsync(Guid id)
+        {
+            return await _dbSet
+                .Include(s => s.Parent)
+                .Include(s => s.Classroom)
+                .Where(e => !e.IsDeleted) 
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<IEnumerable<Student>> GetAllStudentsWithDetailsAsync()
+        {
+            return await _dbSet
+                .Include(s => s.Parent)
+                .Include(s => s.Classroom)
+                .Where(e => !e.IsDeleted)
+                .OrderBy(s => s.FullName)
+                .ToListAsync();
+        }
     }
 }
