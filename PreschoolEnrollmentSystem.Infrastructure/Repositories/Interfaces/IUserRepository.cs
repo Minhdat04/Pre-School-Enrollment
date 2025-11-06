@@ -24,5 +24,8 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces
         Task<IEnumerable<User>> GetInactiveUsersAsync();
         Task<bool> EmailExistsAsync(string email, Guid? excludeUserId = null);
         Task<int> GetUserCountByRoleAsync(UserRole role);
+        Task<User?> GetByEmailAsync(string email);
+        Task<User?> GetByFirebaseUidAsync(string firebaseUid);
+        Task<User?> GetParentWithChildrenAsync(string firebaseUid);
     }
 }

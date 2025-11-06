@@ -14,5 +14,6 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces
         Task<IEnumerable<Child>> GetChildrenByAgeRangeAsync(int minAge, int maxAge);
         Task<bool> ParentHasChildAsync(Guid parentId, string fullName, DateTime birthdate);
         Task<int> GetChildCountByParentAsync(Guid parentId);
+        Task<Child?> GetChildByIdAndParentIdAsync(Guid childId, Guid parentId);
     }
 }

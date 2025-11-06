@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PreschoolEnrollmentSystem.API.Mapping;
 using PreschoolEnrollmentSystem.API.Middleware;
 using PreschoolEnrollmentSystem.Infrastructure.Data;
 using PreschoolEnrollmentSystem.Infrastructure.Firebase;
+using PreschoolEnrollmentSystem.Services.Implementation;
+using PreschoolEnrollmentSystem.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +113,9 @@ builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IAuthSe
     PreschoolEnrollmentSystem.Services.Implementation.FirebaseAuthService>();
 builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IEmailService,
     PreschoolEnrollmentSystem.Services.Implementation.EmailService>();
+builder.Services.AddScoped<IParentService, ParentService>();
+
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
 var app = builder.Build();
 
