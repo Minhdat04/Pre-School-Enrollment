@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using PreschoolEnrollmentSystem.Services.Interfaces;
 
 namespace PreschoolEnrollmentSystem.Services.Implementation
 {
@@ -40,6 +44,11 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
             await _smtpClient.SendMailAsync(message);
         }
 
+        public async Task SendEmailVerificationAsync(string email, string verificationLink)
+        {
+            await SendVerificationEmailAsync(email, verificationLink);
+        }
+
         public async Task SendPasswordResetEmailAsync(string email, string resetLink)
         {
             var message = new MailMessage
@@ -61,6 +70,20 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
                 From = new MailAddress(_configuration["Email:FromEmail"]),
                 Subject = "Password Changed",
                 Body = "<p>Your password has been changed successfully.</p>",
+                IsBodyHtml = true
+            };
+            message.To.Add(email);
+
+            await _smtpClient.SendMailAsync(message);
+        }
+
+        public async Task SendWelcomeEmailAsync(string email, string firstName)
+        {
+            var message = new MailMessage
+            {
+                From = new MailAddress(_configuration["Email:FromEmail"]),
+                Subject = "Welcome to Preschool Enrollment System",
+                Body = $"<p>Hello {firstName},</p><p>Welcome to our Preschool Enrollment System!</p>",
                 IsBodyHtml = true
             };
             message.To.Add(email);

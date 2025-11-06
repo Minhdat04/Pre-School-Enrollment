@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register the DbContext with the dependency injection container
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 1. Add Controllers
 builder.Services.AddControllers();
@@ -80,9 +80,35 @@ catch (Exception ex)
     Console.WriteLine("The API will start but authentication will not work.");
 }
 
-// TODO: Add other services here (DbContext, Repositories, Services, etc.)
-// builder.Services.AddDbContext<ApplicationDbContext>(...);
-// builder.Services.AddScoped<IParentService, ParentService>();
+// 7. Register HttpClientFactory for FirebaseAuthService
+builder.Services.AddHttpClient();
+
+// 8. Register Memory Cache
+builder.Services.AddMemoryCache();
+
+// 9. Register Repositories
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.IUserRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.UserRepository>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.IApplicationRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.ApplicationRepository>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.IChildRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.ChildRepository>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.IStudentRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.StudentRepository>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.IClassroomRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.ClassroomRepository>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.IPaymentRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.PaymentRepository>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.IBlogRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.BlogRepository>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Infrastructure.Repositories.Interfaces.ITagRepository,
+    PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation.TagRepository>();
+
+// 10. Register Services
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IAuthService,
+    PreschoolEnrollmentSystem.Services.Implementation.FirebaseAuthService>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IEmailService,
+    PreschoolEnrollmentSystem.Services.Implementation.EmailService>();
 
 var app = builder.Build();
 
