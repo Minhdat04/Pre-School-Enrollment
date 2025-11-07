@@ -122,7 +122,7 @@ builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IDataSe
 builder.Services.AddScoped<IParentService, ParentService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

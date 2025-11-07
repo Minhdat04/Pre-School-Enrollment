@@ -13,7 +13,10 @@
       "Bash(mysql:*)",
       "Bash(dotnet user-secrets:*)",
       "Bash(dotnet add package:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []
