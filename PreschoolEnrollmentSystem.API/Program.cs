@@ -10,8 +10,24 @@ using PreschoolEnrollmentSystem.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register the DbContext with the dependency injection container
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("ERROR: DefaultConnection string is missing!");
+    Console.WriteLine("Please configure ConnectionStrings:DefaultConnection in appsettings.json or Azure App Settings");
+}
+else
+{
+    Console.WriteLine($"✓ Database connection string loaded (length: {connectionString.Length} chars)");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (!string.IsNullOrEmpty(connectionString))
+    {
+        options.UseMySQL(connectionString);
+    }
+});
 
 // 1. Add Controllers
 builder.Services.AddControllers();
