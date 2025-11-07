@@ -29,14 +29,38 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Firebase
                 {
                     var credentialPath = configuration["Firebase:CredentialPath"];
 
-                    // Why: Check if credential file exists before trying to use it
-                    if (string.IsNullOrEmpty(credentialPath) || !File.Exists(credentialPath))
+                    // Try multiple paths (for local dev and Azure)
+                    var possiblePaths = new[]
                     {
+                        credentialPath, // Original path from config
+                        Path.Combine(AppContext.BaseDirectory, credentialPath ?? ""), // Relative to app directory
+                        Path.Combine(Directory.GetCurrentDirectory(), credentialPath ?? ""), // Current directory
+                        Path.Combine(AppContext.BaseDirectory, "firebase-adminsdk.json"), // Default in app directory
+                        "D:\\home\\site\\wwwroot\\firebase-adminsdk.json" // Azure App Service path
+                    };
+
+                    string? foundPath = null;
+                    foreach (var path in possiblePaths)
+                    {
+                        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                        {
+                            foundPath = path;
+                            Console.WriteLine($"✓ Found Firebase credential file at: {path}");
+                            break;
+                        }
+                    }
+
+                    // Why: Check if credential file exists before trying to use it
+                    if (string.IsNullOrEmpty(foundPath))
+                    {
+                        var searchedPaths = string.Join(", ", possiblePaths.Where(p => !string.IsNullOrEmpty(p)));
                         throw new FileNotFoundException(
-                            "Firebase credential file not found. " +
+                            $"Firebase credential file not found. Searched paths: {searchedPaths}. " +
                             "Download your service account key from Firebase Console and " +
                             "update the path in appsettings.json");
                     }
+
+                    credentialPath = foundPath;
 
                     // Why: Initialize Firebase with the service account credentials
                     // This allows our server to verify tokens and access Firebase services
