@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -134,6 +134,28 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation
             return await _dbSet
                 .Where(u => !u.IsDeleted && u.Role == role)
                 .CountAsync();
+        }
+
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _dbSet
+                .Where(e => !e.IsDeleted)
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User?> GetByFirebaseUidAsync(string firebaseUid)
+        {
+            return await _dbSet
+                .Where(e => !e.IsDeleted)
+                .FirstOrDefaultAsync(u => u.FirebaseUid == firebaseUid);
+        }
+
+        public async Task<User?> GetParentWithChildrenAsync(string firebaseUid)
+        {
+            return await _dbSet
+                .Include(u => u.Children.Where(c => !c.IsDeleted)) // Chỉ nạp các con chưa bị xóa
+                .Where(e => !e.IsDeleted)
+                .FirstOrDefaultAsync(u => u.FirebaseUid == firebaseUid);
         }
     }
 }

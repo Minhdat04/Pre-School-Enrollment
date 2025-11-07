@@ -69,5 +69,12 @@ namespace PreschoolEnrollmentSystem.Infrastructure.Repositories.Implementation
                 .Where(c => !c.IsDeleted && c.ParentId == parentId)
                 .CountAsync();
         }
+
+        public async Task<Child?> GetChildByIdAndParentIdAsync(Guid childId, Guid parentId)
+        {
+            return await _dbSet
+                .Where(c => !c.IsDeleted && c.Id == childId && c.ParentId == parentId)
+                .FirstOrDefaultAsync();
+        }
     }
 }
