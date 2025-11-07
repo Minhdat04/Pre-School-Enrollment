@@ -80,13 +80,15 @@ namespace PreschoolEnrollmentSystem.API.Middleware
                                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                                 new Claim("firebase_uid", user.FirebaseUid),
                                 new Claim(ClaimTypes.Email, user.Email),
-                                new Claim(ClaimTypes.Role, user.Role.ToString())
+                                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
                             };
 
-                            var identity = new ClaimsIdentity(claims, "SeedUser");
+                            // IMPORTANT: Use an authentication type to mark identity as authenticated
+                            var identity = new ClaimsIdentity(claims, "Bearer");
                             context.User = new ClaimsPrincipal(identity);
 
-                            _logger.LogInformation("Seed user {Email} authenticated successfully", email);
+                            _logger.LogInformation("Seed user {Email} authenticated successfully with role {Role}", email, user.Role);
                             await _next(context);
                             return;
                         }
