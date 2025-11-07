@@ -208,12 +208,27 @@ namespace PreschoolEnrollmentSystem.API.Middleware
             if (string.IsNullOrEmpty(authHeader))
                 return null;
 
-            // Why: Check if it starts with "Bearer " and extract the actual token
-            if (authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            _logger.LogInformation("Raw Authorization header: '{Header}', length={Length}",
+                authHeader.Length > 30 ? authHeader.Substring(0, 30) + "..." : authHeader,
+                authHeader.Length);
+
+            // Why: Check if it starts with "Bearer" and extract the actual token
+            // More robust: split on whitespace to handle any spacing issues
+            if (authHeader.StartsWith("Bearer", StringComparison.OrdinalIgnoreCase))
             {
-                return authHeader.Substring("Bearer ".Length).Trim();
+                // Split on whitespace and take the second part (the token)
+                var parts = authHeader.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2)
+                {
+                    var extracted = parts[1].Trim();
+                    _logger.LogInformation("Extracted token after removing Bearer: length={Length}, first 20={Preview}",
+                        extracted.Length,
+                        extracted.Length > 20 ? extracted.Substring(0, 20) + "..." : extracted);
+                    return extracted;
+                }
             }
 
+            _logger.LogInformation("Header does not start with 'Bearer', returning as-is");
             return authHeader;
         }
 
