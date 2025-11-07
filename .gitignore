@@ -88,3 +88,6 @@ secrets.json
 
 # Mac
 .DS_Store
+# Deployment artifacts
+publish/
+deployment.zip
