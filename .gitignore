@@ -28,10 +28,6 @@ bld/
 # Rider
 .idea/
 
-# Firebase credentials (IMPORTANT!)
-firebase-adminsdk*.json
-*-firebase-adminsdk-*.json
-
 # NuGet Packages
 *.nupkg
 *.snupkg
