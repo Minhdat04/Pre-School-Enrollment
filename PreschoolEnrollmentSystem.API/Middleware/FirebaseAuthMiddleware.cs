@@ -19,6 +19,7 @@ namespace PreschoolEnrollmentSystem.API.Middleware
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/reset-password",
+            "/api/seed",
             "/swagger",
             "/health"
         };

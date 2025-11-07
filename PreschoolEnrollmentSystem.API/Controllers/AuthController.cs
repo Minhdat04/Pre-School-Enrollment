@@ -3,9 +3,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using PreschoolEnrollmentSystem.API.DTOs.Auth;
+using PreschoolEnrollmentSystem.Core.DTOs.Auth;
 using PreschoolEnrollmentSystem.API.Filters;
 using PreschoolEnrollmentSystem.Services.Interfaces;
+using PreschoolEnrollmentSystem.Core.DTOs.Shared; 
+using PreschoolEnrollmentSystem.API.Helpers;
 
 namespace PreschoolEnrollmentSystem.API.Controllers
 {
@@ -675,22 +677,22 @@ namespace PreschoolEnrollmentSystem.API.Controllers
 
     #region Helper Classes
 
-    /// Standard error response format
-    public class ErrorResponse
-    {
-        public string Error { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-        public string? Details { get; set; }
-        public DateTime Timestamp { get; set; }
-        public string Path { get; set; } = string.Empty;
-    }
+    ///// Standard error response format
+    //public class ErrorResponse
+    //{
+    //    public string Error { get; set; } = string.Empty;
+    //    public string Message { get; set; } = string.Empty;
+    //    public string? Details { get; set; }
+    //    public DateTime Timestamp { get; set; }
+    //    public string Path { get; set; } = string.Empty;
+    //}
 
-    /// Standard success response format
-    public class SuccessResponse
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-    }
+    ///// Standard success response format
+    //public class SuccessResponse
+    //{
+    //    public bool Success { get; set; }
+    //    public string Message { get; set; } = string.Empty;
+    //}
 
     /// Refresh token request
     public class RefreshTokenRequest
@@ -702,15 +704,15 @@ namespace PreschoolEnrollmentSystem.API.Controllers
 }
 
 /// Extension methods for ModelStateDictionary
-public static class ModelStateExtensions
-{
-    public static string ToErrorString(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
-    {
-        var errors = modelState.Values
-            .SelectMany(v => v.Errors)
-            .Select(e => e.ErrorMessage)
-            .ToList();
+//public static class ModelStateExtensions
+//{
+//    public static string ToErrorString(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
+//    {
+//        var errors = modelState.Values
+//            .SelectMany(v => v.Errors)
+//            .Select(e => e.ErrorMessage)
+//            .ToList();
 
-        return string.Join("; ", errors);
-    }
-}
+//        return string.Join("; ", errors);
+//    }
+//}

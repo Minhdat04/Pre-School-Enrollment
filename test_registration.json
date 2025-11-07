@@ -1,0 +1,10 @@
+{
+  "email": "testparent@example.com",
+  "password": "TestPass123@",
+  "confirmPassword": "TestPass123@",
+  "firstName": "John",
+  "lastName": "Doe",
+  "role": "Parent",
+  "phoneNumber": "+84123456789",
+  "acceptTerms": true
+}
