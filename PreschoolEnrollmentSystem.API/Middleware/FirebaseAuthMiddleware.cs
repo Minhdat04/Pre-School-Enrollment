@@ -65,7 +65,10 @@ namespace PreschoolEnrollmentSystem.API.Middleware
                 // Check if this is a seed user token (Base64 encoded email:timestamp)
                 if (IsSeedUserToken(token))
                 {
+                    _logger.LogInformation("Detected seed user token");
                     var email = ExtractEmailFromSeedToken(token);
+                    _logger.LogInformation("Extracted email from seed token: {Email}", email);
+
                     if (!string.IsNullOrEmpty(email))
                     {
                         using var scope = _serviceProvider.CreateScope();
@@ -86,17 +89,44 @@ namespace PreschoolEnrollmentSystem.API.Middleware
 
                             // IMPORTANT: Use an authentication type to mark identity as authenticated
                             var identity = new ClaimsIdentity(claims, "Bearer");
-                            context.User = new ClaimsPrincipal(identity);
+                            var principal = new ClaimsPrincipal(identity);
+                            context.User = principal;
 
-                            _logger.LogInformation("Seed user {Email} authenticated successfully with role {Role}", email, user.Role);
+                            // Verify the identity is authenticated
+                            _logger.LogInformation("Seed user {Email} authenticated. IsAuthenticated={IsAuth}, Role={Role}",
+                                email, principal.Identity?.IsAuthenticated, user.Role);
+
                             await _next(context);
                             return;
                         }
+                        else
+                        {
+                            _logger.LogWarning("User not found or not a seed user: {Email}", email);
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            await context.Response.WriteAsJsonAsync(new
+                            {
+                                error = "Unauthorized",
+                                message = "Invalid seed user token"
+                            });
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Could not extract email from seed token");
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            error = "Unauthorized",
+                            message = "Invalid token format"
+                        });
+                        return;
                     }
                 }
 
-                // Step 2: Verify the token with Firebase
+                // Step 2: Verify the token with Firebase (only for real Firebase JWTs)
                 // Why: Firebase validates the token signature and expiration
+                _logger.LogInformation("Token appears to be a Firebase JWT token, verifying...");
                 var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
 
                 // Step 3: Extract user information from the decoded token
