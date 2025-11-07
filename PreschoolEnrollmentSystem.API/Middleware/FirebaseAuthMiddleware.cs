@@ -62,6 +62,11 @@ namespace PreschoolEnrollmentSystem.API.Middleware
                     return;
                 }
 
+                _logger.LogInformation("Extracted token for path {Path}: length={Length}, first 20 chars={Preview}",
+                    context.Request.Path,
+                    token.Length,
+                    token.Length > 20 ? token.Substring(0, 20) + "..." : token);
+
                 // Check if this is a seed user token (Base64 encoded email:timestamp)
                 if (IsSeedUserToken(token))
                 {
@@ -228,7 +233,16 @@ namespace PreschoolEnrollmentSystem.API.Middleware
         {
             // JWT tokens have 3 parts separated by dots
             // Seed tokens are Base64 encoded strings without dots
-            return !token.Contains('.');
+            var hasDots = token.Contains('.');
+            var isSeedToken = !hasDots;
+
+            _logger.LogInformation("Token detection: length={Length}, contains dots={HasDots}, is seed token={IsSeedToken}, preview={Preview}",
+                token.Length,
+                hasDots,
+                isSeedToken,
+                token.Length > 30 ? token.Substring(0, 30) + "..." : token);
+
+            return isSeedToken;
         }
 
         /// <summary>
