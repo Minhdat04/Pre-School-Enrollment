@@ -1,0 +1,122 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for Preschool Enrollment System
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() &&
+             request.auth.token.role == 'Admin';
+    }
+
+    // Helper function to check if user is staff
+    function isStaff() {
+      return isAuthenticated() &&
+             (request.auth.token.role == 'Staff' ||
+              request.auth.token.role == 'Teacher' ||
+              isAdmin());
+    }
+
+    // Helper function to check if user is parent
+    function isParent() {
+      return isAuthenticated() &&
+             request.auth.token.role == 'Parent';
+    }
+
+    // Helper function to validate file size (max 5MB)
+    function isValidSize() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+
+    // Helper function to validate image file types
+    function isImageFile() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // Helper function to validate document file types
+    function isDocumentFile() {
+      return request.resource.contentType.matches('application/pdf') ||
+             request.resource.contentType.matches('application/msword') ||
+             request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.*');
+    }
+
+    // Student photos - only staff can upload/delete, authenticated users can read
+    match /students/photos/{studentId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isStaff() && isImageFile() && isValidSize();
+      allow delete: if isStaff();
+    }
+
+    // Student documents - only staff can upload/delete, staff and parents can read
+    match /students/documents/{studentId}/{fileName} {
+      allow read: if isStaff() || isParent();
+      allow write: if isStaff() && isDocumentFile() && isValidSize();
+      allow delete: if isStaff();
+    }
+
+    // Parent ID verification - parents can upload their own, staff can read/write all
+    match /parents/id-verification/{parentId}/{fileName} {
+      allow read: if isStaff() || (isParent() && request.auth.uid == parentId);
+      allow write: if (isParent() && request.auth.uid == parentId && isImageFile() && isValidSize()) || isStaff();
+      allow delete: if isStaff();
+    }
+
+    // Application documents - parents can upload for their applications, staff can read all
+    match /applications/{applicationId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isDocumentFile() && isValidSize();
+      allow delete: if isStaff();
+    }
+
+    // Payment receipts - system generates, authenticated users can read
+    match /payments/receipts/{paymentId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isStaff() && isValidSize();
+      allow delete: if isAdmin();
+    }
+
+    // User profile photos - users can upload their own, all authenticated users can read
+    match /users/profile-photos/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if (isAuthenticated() && request.auth.uid == userId && isImageFile() && isValidSize()) || isStaff();
+      allow delete: if (isAuthenticated() && request.auth.uid == userId) || isStaff();
+    }
+
+    // School announcements/media - only staff can upload, all authenticated users can read
+    match /announcements/{announcementId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isStaff() && isValidSize();
+      allow delete: if isStaff();
+    }
+
+    // Class materials - teachers can upload, students/parents can read
+    match /classes/{classId}/materials/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isStaff() && isValidSize();
+      allow delete: if isStaff();
+    }
+
+    // Admin uploads - only admins can read/write
+    match /admin/{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Temporary uploads folder - authenticated users can upload, auto-delete after processing
+    match /temp/{userId}/{fileName} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAuthenticated() && request.auth.uid == userId && isValidSize();
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

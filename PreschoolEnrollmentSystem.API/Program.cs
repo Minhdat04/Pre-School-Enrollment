@@ -109,6 +109,12 @@ builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IAuthSe
     PreschoolEnrollmentSystem.Services.Implementation.FirebaseAuthService>();
 builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IEmailService,
     PreschoolEnrollmentSystem.Services.Implementation.EmailService>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IFirebaseStorageService,
+    PreschoolEnrollmentSystem.Services.Implementation.FirebaseStorageService>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IFirebaseNotificationService,
+    PreschoolEnrollmentSystem.Services.Implementation.FirebaseNotificationService>();
+builder.Services.AddScoped<PreschoolEnrollmentSystem.Services.Interfaces.IDataSeedingService,
+    PreschoolEnrollmentSystem.Services.Implementation.DataSeedingService>();
 
 var app = builder.Build();
 

@@ -10,7 +10,10 @@
       "Bash(dotnet ef database update:*)",
       "Bash(dotnet run)",
       "Bash(curl:*)",
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Bash(dotnet user-secrets:*)",
+      "Bash(dotnet add package:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
