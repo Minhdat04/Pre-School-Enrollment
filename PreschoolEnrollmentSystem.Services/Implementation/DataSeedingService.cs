@@ -151,26 +151,10 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
             {
                 try
                 {
-                    // Create user in Firebase
-                    var userRecordArgs = new UserRecordArgs
-                    {
-                        Email = userData.Email,
-                        Password = SeedDataConstants.DEFAULT_PASSWORD,
-                        EmailVerified = true,
-                        DisplayName = $"{userData.FirstName} {userData.LastName}",
-                        Disabled = false
-                    };
+                    // Generate a mock Firebase UID for testing (format: seed_email@domain)
+                    var mockFirebaseUid = $"seed_{userData.Email.Replace("@", "_at_").Replace(".", "_")}";
 
-                    var firebaseUser = await _firebaseAuth.CreateUserAsync(userRecordArgs);
-
-                    // Set custom claims for role
-                    var claims = new Dictionary<string, object>
-                    {
-                        { "role", userData.Role.ToString() }
-                    };
-                    await _firebaseAuth.SetCustomUserClaimsAsync(firebaseUser.Uid, claims);
-
-                    // Create user in database
+                    // Create user in database only (skip Firebase for now)
                     Guid? classroomId = null;
                     if (userData.Role == UserRole.Teacher && teacherIndex < classrooms.Count)
                     {
@@ -181,13 +165,13 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
                     var user = new User
                     {
                         Id = Guid.NewGuid(),
-                        FirebaseUid = firebaseUser.Uid,
+                        FirebaseUid = mockFirebaseUid,
                         Email = userData.Email,
                         Username = userData.Username,
                         FirstName = userData.FirstName,
                         LastName = userData.LastName,
                         Phone = userData.Phone,
-                        PasswordHash = "FIREBASE_MANAGED",
+                        PasswordHash = BCrypt.Net.BCrypt.HashPassword(SeedDataConstants.DEFAULT_PASSWORD),
                         Role = userData.Role,
                         Status = UserStatus.Active,
                         EmailVerified = true,
@@ -204,18 +188,18 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
                     _context.Users.Add(user);
                     users[userData.Email] = user;
 
-                    _logger.LogInformation("Created user: {Email} ({Role}) with Firebase UID: {Uid}",
-                        userData.Email, userData.Role, firebaseUser.Uid);
+                    _logger.LogInformation("Created user in database: {Email} ({Role}) with mock UID: {Uid}",
+                        userData.Email, userData.Role, mockFirebaseUid);
                 }
-                catch (FirebaseAuthException ex)
+                catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to create Firebase user for {Email}", userData.Email);
+                    _logger.LogError(ex, "Failed to create user for {Email}", userData.Email);
                     throw;
                 }
             }
 
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Created {Count} users", users.Count);
+            _logger.LogInformation("Created {Count} users in database (Firebase creation skipped for testing)", users.Count);
 
             return users;
         }
