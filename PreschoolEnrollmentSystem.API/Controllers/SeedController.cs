@@ -39,13 +39,14 @@ namespace PreschoolEnrollmentSystem.API.Controllers
         {
             try
             {
-                // Safety check: Only allow in Development environment
-                if (!_environment.IsDevelopment())
+                // Safety check: Warn if in Production but allow with confirmation
+                if (_environment.IsProduction() && !confirm)
                 {
                     return StatusCode(403, new
                     {
                         success = false,
-                        message = "Seeding is only allowed in Development environment"
+                        message = "Seeding in Production requires explicit confirmation. Add '?confirm=true' to proceed.",
+                        warning = "This will create test data in your production database!"
                     });
                 }
 
@@ -119,13 +120,14 @@ namespace PreschoolEnrollmentSystem.API.Controllers
         {
             try
             {
-                // Safety check: Only allow in Development environment
-                if (!_environment.IsDevelopment())
+                // Safety check: Warn if in Production but allow with confirmation
+                if (_environment.IsProduction() && !confirm)
                 {
                     return StatusCode(403, new
                     {
                         success = false,
-                        message = "Clearing seed data is only allowed in Development environment"
+                        message = "Clearing seed data in Production requires explicit confirmation. Add '?confirm=true' to proceed.",
+                        warning = "This will delete test data from your production database!"
                     });
                 }
 
@@ -181,13 +183,14 @@ namespace PreschoolEnrollmentSystem.API.Controllers
         {
             try
             {
-                // Safety check: Only allow in Development environment
-                if (!_environment.IsDevelopment())
+                // Safety check: Warn if in Production but allow with confirmation
+                if (_environment.IsProduction() && !confirm)
                 {
                     return StatusCode(403, new
                     {
                         success = false,
-                        message = "File upload seeding is only allowed in Development environment"
+                        message = "File upload seeding in Production requires explicit confirmation. Add '?confirm=true' to proceed.",
+                        warning = "This will upload test files to your production Firebase Storage!"
                     });
                 }
 
