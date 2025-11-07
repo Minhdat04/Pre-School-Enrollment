@@ -264,7 +264,62 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
             {
                 _logger.LogInformation("Login attempt for email: {Email}", request.Email);
 
-                // Authenticate with Firebase
+                // First check if user exists in database
+                var user = await _userRepository.GetUserByEmailAsync(request.Email);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("Login failed: User not found - {Email}", request.Email);
+                    throw new UnauthorizedAccessException("Invalid email or password");
+                }
+
+                // Check if this is a seed user (database-only authentication)
+                if (user.FirebaseUid.StartsWith("seed_") && user.PasswordHash != "FIREBASE_MANAGED")
+                {
+                    _logger.LogInformation("Database-only authentication for seed user: {Email}", request.Email);
+
+                    // Verify password with BCrypt
+                    if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                    {
+                        _logger.LogWarning("Database authentication failed for {Email}", request.Email);
+                        throw new UnauthorizedAccessException("Invalid email or password");
+                    }
+
+                    // Check if user is active
+                    if (!user.IsActive || user.Status != UserStatus.Active)
+                    {
+                        _logger.LogWarning("Login attempt for inactive user: {Email}", request.Email);
+                        throw new InvalidOperationException("Your account is currently inactive. Please contact support.");
+                    }
+
+                    // Update last login
+                    user.UpdateLastLogin();
+                    _userRepository.Update(user);
+                    await _userRepository.SaveChangesAsync();
+
+                    _logger.LogInformation("Database login successful for {Email}", request.Email);
+
+                    // Generate a mock token for seed users (for testing purposes)
+                    var mockToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{user.Email}:{DateTime.UtcNow.Ticks}"));
+
+                    return new LoginResponseDto
+                    {
+                        IdToken = mockToken,
+                        RefreshToken = string.Empty,
+                        ExpiresAt = DateTime.UtcNow.AddHours(TOKEN_EXPIRATION_HOURS),
+                        UserId = user.Id,
+                        FirebaseUid = user.FirebaseUid,
+                        Email = user.Email,
+                        EmailVerified = user.EmailVerified,
+                        FullName = user.GetFullName(),
+                        Role = user.Role.ToRoleString(),
+                        IsActive = user.IsActive,
+                        ProfileCompletionPercentage = user.ProfileCompletionPercentage,
+                        CanEnroll = user.CanEnroll()
+                    };
+                }
+
+                // Original Firebase authentication for non-seed users
                 var firebaseResponse = await SignInWithFirebaseAsync(request.Email, request.Password);
 
                 if (firebaseResponse == null || string.IsNullOrEmpty(firebaseResponse.IdToken))
@@ -285,21 +340,9 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
                     throw new InvalidOperationException("User account not found", ex);
                 }
 
-                // Find user in database by Firebase UID
-                var user = await _userRepository.FindSingleAsync(u => u.FirebaseUid == firebaseUser.Uid);
-
-                if (user == null)
+                // Update Firebase UID if it was missing
+                if (user.FirebaseUid != firebaseUser.Uid)
                 {
-                    // Fallback: Try to find by email
-                    user = await _userRepository.GetUserByEmailAsync(request.Email);
-
-                    if (user == null)
-                    {
-                        _logger.LogError("User record not found for Firebase UID: {Uid}", firebaseUser.Uid);
-                        throw new InvalidOperationException("User profile not found. Please contact support.");
-                    }
-
-                    // Update Firebase UID if it was missing
                     user.FirebaseUid = firebaseUser.Uid;
                     _userRepository.Update(user);
                     await _userRepository.SaveChangesAsync();
@@ -317,7 +360,7 @@ namespace PreschoolEnrollmentSystem.Services.Implementation
                 _userRepository.Update(user);
                 await _userRepository.SaveChangesAsync();
 
-                _logger.LogInformation("Login successful for {Email}", request.Email);
+                _logger.LogInformation("Firebase login successful for {Email}", request.Email);
 
                 // Build and return login response
                 return new LoginResponseDto
